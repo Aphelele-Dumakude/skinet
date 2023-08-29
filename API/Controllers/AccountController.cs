@@ -97,6 +97,12 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
+            if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
+            {
+                return new BadRequestObjectResult(new ApiValidationErrorResponse{
+                    Errors = new []{"Email address is already in use"}
+                });
+            } 
             var user = new AppUser
             {
                 DisplayName = registerDto.DisplayName,
@@ -114,6 +120,11 @@ namespace API.Controllers
                 Token = _tokenService.CreateToken(user),
                 DisplayName = user.DisplayName
             };
+        }
+
+        private ActionResult<UserDto> BadRequestObjectResult(ApiValidationErrorResponse apiValidationErrorResponse)
+        {
+            throw new NotImplementedException();
         }
     }
 }
